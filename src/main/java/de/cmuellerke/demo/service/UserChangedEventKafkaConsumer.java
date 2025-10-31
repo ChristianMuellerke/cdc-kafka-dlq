@@ -27,9 +27,9 @@ public class UserChangedEventKafkaConsumer {
 
     private CountDownLatch latch = new CountDownLatch(1);
     private UserChangedEvent receivedUserChangedEvent;
-    private ReplicatedUserRepository replicatedUserRepository;
-    
+    private final ReplicatedUserRepository replicatedUserRepository;
     private final DLQEventKafkaProducer dlqProducer;
+    
     @KafkaListener(topics = "${application.topics.users.replication}")
     public void receive(UserChangedEvent userChangedEvent) {
         log.info("[UserChangedEventConsumer] received UserChangedEvent with user id '{}'", userChangedEvent.getUser().getId());
