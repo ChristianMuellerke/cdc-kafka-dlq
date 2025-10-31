@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import de.cmuellerke.demo.entity.User;
 import de.cmuellerke.demo.event.UserReplicationFailedEvent;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DLQEventKafkaProducer {
 
     @Autowired
-    private KafkaTemplate<String, UserReplicationFailedEvent> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Value("${application.topics.users.replication.dlq}")
     private String topic;

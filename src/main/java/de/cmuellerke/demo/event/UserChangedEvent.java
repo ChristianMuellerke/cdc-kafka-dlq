@@ -9,4 +9,5 @@ import lombok.Data;
 public class UserChangedEvent {
     private User user;
     private String action;
+    private int retryCount;
 }

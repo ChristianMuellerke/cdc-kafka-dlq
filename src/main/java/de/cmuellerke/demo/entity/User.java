@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private UUID id; // this is a user id
     private String vorname;
     private String nachname;
     private int retryCount;

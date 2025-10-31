@@ -1,0 +1,6 @@
+de/cmuellerke/demo/DemoServiceApplicationTests.class
+de/cmuellerke/demo/service/KafkaConsumerTest.class
+de/cmuellerke/demo/DatabaseIntegrationTest.class
+de/cmuellerke/demo/service/OutboxPollingServiceTest.class
+de/cmuellerke/demo/WebIntegrationTest.class
+de/cmuellerke/demo/repository/UserRepositoryTest.class

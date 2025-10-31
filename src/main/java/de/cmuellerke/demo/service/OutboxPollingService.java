@@ -1,10 +1,10 @@
 package de.cmuellerke.demo.service;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +29,7 @@ public class OutboxPollingService {
     
     final UserRepository userRepository;
     final OutboxRepository outboxRepository;
-    final KafkaTemplate<String, UserChangedEvent> kafkaTemplate;
+    final KafkaTemplate<String, Object> kafkaTemplate;
 
     
     @Scheduled(fixedDelay = 1000, timeUnit = TimeUnit.MILLISECONDS)
@@ -45,13 +45,17 @@ public class OutboxPollingService {
             Pageable limit = PageRequest.of(0, 100);
             Page<OutboxEntry> entries = outboxRepository.findAll(limit);
             entries.get().forEach(this::send);
-            
         }
     }
     
     public void send(OutboxEntry entry) {
-        userRepository.findById(entry.getId()).ifPresentOrElse(user -> {
+        UUID id = entry.getId();
+        Objects.requireNonNull(id);
+        userRepository.findById(id).ifPresentOrElse(user -> {
             sendMessage(user);
+
+            log.info("deleting outbox entry {}", id);
+            outboxRepository.deleteById(id);
         }, () -> {
             // was soll passieren, wenn User nicht gefunden wird? das dürfte es eigentlich gar nicht geben 
             // (okay doch: Outbox nicht abgearbeitet aber User schon gelöscht?)
@@ -61,7 +65,7 @@ public class OutboxPollingService {
 
     public void sendMessage(User user) {
         UserChangedEvent userChangedEvent = UserChangedEvent.builder().action("I").user(user).build();
-        CompletableFuture<SendResult<String, UserChangedEvent>> future = kafkaTemplate.send(KafkaProducerConfig.USER_REPLICA_TOPIC, userChangedEvent);
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(KafkaProducerConfig.USER_REPLICA_TOPIC, userChangedEvent);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
                 log.info("Sent UserChangedEvent=[" + user.getId() + 

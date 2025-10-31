@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserChangedEventKafkaProducer {
 
     @Autowired
-    private KafkaTemplate<String, User> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     public void send(String topic, User user) {
         // TODO refactor: diesem producer braucht man nicht von aussen ein topic zu benennen

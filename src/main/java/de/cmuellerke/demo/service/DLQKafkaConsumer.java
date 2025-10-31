@@ -2,7 +2,6 @@ package de.cmuellerke.demo.service;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 

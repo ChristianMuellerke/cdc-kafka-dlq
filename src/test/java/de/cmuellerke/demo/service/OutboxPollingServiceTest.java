@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
@@ -53,10 +52,10 @@ public class OutboxPollingServiceTest implements WithAssertions {
 
 		boolean messageConsumed = consumer.getLatch().await(120, TimeUnit.SECONDS);
         assertTrue(messageConsumed);
-        assertThat(consumer.getReceivedUser()).isNotNull();
-        assertThat(consumer.getReceivedUser().getId()).isEqualTo(newUser.getId()); 
-        assertThat(consumer.getReceivedUser().getVorname()).isEqualTo(newUser.getVorname()); 
-        assertThat(consumer.getReceivedUser().getNachname()).isEqualTo(newUser.getNachname()); 
+        assertThat(consumer.getReceivedUserChangedEvent()).isNotNull();
+        assertThat(consumer.getReceivedUserChangedEvent().getUser().getId()).isEqualTo(newUser.getId()); 
+        assertThat(consumer.getReceivedUserChangedEvent().getUser().getVorname()).isEqualTo(newUser.getVorname()); 
+        assertThat(consumer.getReceivedUserChangedEvent().getUser().getNachname()).isEqualTo(newUser.getNachname()); 
 
 
         outboxPoller.poll();

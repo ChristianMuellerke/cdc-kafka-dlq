@@ -30,7 +30,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic usersReplicaDLQTopic() {
-        return new NewTopic(KafkaProducerConfig.USER_REPLICA_TOPIC, 1, (short) 1);
+        return new NewTopic(KafkaProducerConfig.USER_REPLICA_DLQ_TOPIC, 1, (short) 1);
     }
 
 }
