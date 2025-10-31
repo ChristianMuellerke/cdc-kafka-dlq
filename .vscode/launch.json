@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-DemoServiceApplication<demo-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "de.cmuellerke.demo.DemoServiceApplication",
+            "projectName": "demo-service",
+            "args": "--spring.profiles.active=dev",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
