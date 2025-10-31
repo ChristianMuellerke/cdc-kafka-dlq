@@ -1,6 +1,0 @@
-/home/cm/develop/cdc-kafka-dlq/src/test/java/de/cmuellerke/demo/DatabaseIntegrationTest.java
-/home/cm/develop/cdc-kafka-dlq/src/test/java/de/cmuellerke/demo/DemoServiceApplicationTests.java
-/home/cm/develop/cdc-kafka-dlq/src/test/java/de/cmuellerke/demo/WebIntegrationTest.java
-/home/cm/develop/cdc-kafka-dlq/src/test/java/de/cmuellerke/demo/repository/UserRepositoryTest.java
-/home/cm/develop/cdc-kafka-dlq/src/test/java/de/cmuellerke/demo/service/KafkaConsumerTest.java
-/home/cm/develop/cdc-kafka-dlq/src/test/java/de/cmuellerke/demo/service/OutboxPollingServiceTest.java
