@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class OutboxEntry {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Nonnull

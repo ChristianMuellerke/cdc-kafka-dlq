@@ -38,23 +38,22 @@ public class UserChangedEventKafkaConsumer {
         if (userChangedEvent.getUser().getNachname().equals("Fehlerteufel")){
             UserReplicationFailedEvent dlqEvent = UserReplicationFailedEvent.builder()
             .lastRetry(ZonedDateTime.now())
-            .originalEvent(null) // TODO!
+            .originalEvent(userChangedEvent) // TODO!
             .retryCount(0)
             .build();
 
             sendToDLQ(userChangedEvent);
+        } else {
+            ReplicatedUser replicatedUser = ReplicatedUser.builder()
+                .id(userChangedEvent.getUser().getId())
+                .nachname(userChangedEvent.getUser().getNachname())
+                .vorname(userChangedEvent.getUser().getVorname())
+                .retryCount(userChangedEvent.getRetryCount())
+                .build();
+
+            replicatedUserRepository.save(replicatedUser);
         }
-
-        // TODO hier jetzt in die users_replica speichern
-        ReplicatedUser replicatedUser = ReplicatedUser.builder()
-            .id(userChangedEvent.getUser().getId())
-            .nachname(userChangedEvent.getUser().getNachname())
-            .vorname(userChangedEvent.getUser().getVorname())
-            .retryCount(userChangedEvent.getRetryCount())
-            .build();
-
-        replicatedUserRepository.save(replicatedUser);
-
+        
         latch.countDown();
     }
 

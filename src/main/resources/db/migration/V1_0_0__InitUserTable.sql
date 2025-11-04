@@ -30,7 +30,7 @@ create table if not exists users_replica (
 create table if not exists users_replica_dlq (
     id uuid not null,
     tspInserted TIMESTAMP WITH TIME ZONE not null, 
-    payload varchar(5000),
+    payload text,
     retryCount int, 
     primary key (id)
 );

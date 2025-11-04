@@ -2,7 +2,10 @@ package de.cmuellerke.demo.service;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.WithAssertions;
@@ -13,14 +16,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.cmuellerke.demo.entity.DLQInboxEntry;
 import de.cmuellerke.demo.entity.ReplicatedUser;
 import de.cmuellerke.demo.entity.User;
+import de.cmuellerke.demo.event.UserChangedEvent;
+import de.cmuellerke.demo.repository.DLQInboxRepository;
 import de.cmuellerke.demo.repository.OutboxRepository;
 import de.cmuellerke.demo.repository.ReplicatedUserRepository;
 import de.cmuellerke.demo.repository.UserRepository;
 import de.cmuellerke.demo.repository.UserRepositoryTest;
-import jdk.jfr.Description;
 
 @SpringBootTest
 @ActiveProfiles(profiles = "dev")
@@ -43,6 +52,14 @@ public class OutboxPollingServiceTest implements WithAssertions {
 
     @Autowired
     private UserChangedEventKafkaConsumer consumer;
+
+    @Autowired
+    private DLQKafkaConsumer dlqConsumer;
+
+    @Autowired
+    private DLQInboxRepository inboxRepository;
+
+    private DLQInboxEntry save;
 
     // @Autowired
     // private UserChangedEventKafkaProducer producer;
@@ -80,5 +97,49 @@ public class OutboxPollingServiceTest implements WithAssertions {
         });
 	}
 
-    // Test für 
+    @Test
+    @DisplayName("replication fails")
+	void testReplicationFails() throws InterruptedException {
+    	replicatedUserRepository.deleteAll();
+    	
+		User newUser = UserRepositoryTest.createUser();
+        newUser.setNachname("Fehlerteufel");
+		User savedUser = userRepository.save(newUser);
+		boolean messageConsumed = consumer.getLatch().await(10, TimeUnit.SECONDS);
+        assertTrue(messageConsumed);
+
+		boolean dlqMessageConsumed = dlqConsumer.getLatch().await(10, TimeUnit.SECONDS);
+        assertTrue(dlqMessageConsumed);
+        
+        assertThat(outboxRepository.count()).isZero();
+        assertThat(replicatedUserRepository.findById(savedUser.getId())).isEmpty();
+	}
+
+
+    @Test
+    @Transactional
+    @DisplayName("dlq message can be persisted")
+	void savesDLT() throws InterruptedException, JsonProcessingException {
+        
+    	User user = User.builder()
+            .id(UUID.randomUUID())
+            .vorname("fatal")
+            .nachname("failure")
+            .retryCount(1)
+            .build();
+        
+        UserChangedEvent originalEvent = UserChangedEvent.builder().user(user).build();
+        
+        String originalEventAsJson = new ObjectMapper().writeValueAsString(originalEvent);
+
+        DLQInboxEntry dlqInboxEntry = DLQInboxEntry.builder()
+            .tspInserted(Timestamp.from(Instant.now()))
+            .originalEventAsJson(originalEventAsJson)
+            .build();
+
+        DLQInboxEntry savedEntry = inboxRepository.save(dlqInboxEntry);
+        assertThat(savedEntry.getId()).isNotNull();
+
+        assertThat(savedEntry.getOriginalEventAsJson()).isNotNull().isNotBlank().isNotEmpty();
+    } 
 }

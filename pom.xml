@@ -15,6 +15,7 @@
 	<name>cdc-kafka-dlq</name>
 	<properties>
 		<maven.compiler.release>21</maven.compiler.release>
+		<jackson-module-jakarta-xmlbind-annotation>2.19.4</jackson-module-jakarta-xmlbind-annotation>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -65,6 +66,18 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-63</artifactId>
+			<version>3.11.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+			<version>${jackson-module-jakarta-xmlbind-annotation}</version>
 		</dependency>
 
 		<dependency>
